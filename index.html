@@ -1,2149 +1,2576 @@
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
-  :root{
-    --bg:#0A130F;
-    --surface:#121C17;
-    --surface-2:#1B2620;
-    --border:rgba(255,255,255,.07);
-    --text:#F3F1E6;
-    --text-dim:#7E978A;
-    --gold:#F5C451;
-    --turf:#3FCB8C;
-    --live:#FF5C68;
-  }
+<!DOCTYPE html>
+<html lang="en">
 
-  *{ box-sizing:border-box; }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Cup 2026 Dashboard</title>
 
-  body{
-    margin:0;
-    background:
-      radial-gradient(circle at 50% -10%, rgba(245,196,81,.08), transparent 60%),
-      var(--bg);
-    color:var(--text);
-    font-family:'Inter',-apple-system,Roboto,Helvetica,Arial,sans-serif;
-    padding:18px 16px 32px;
-    -webkit-font-smoothing:antialiased;
-  }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
-  .page{ display:flex; flex-direction:column; gap:22px; max-width:520px; margin:0 auto; }
+    :root {
+      --bg: #0A130F;
+      --surface: #121C17;
+      --surface-2: #1B2620;
+      --border: rgba(255, 255, 255, .07);
+      --text: #F3F1E6;
+      --text-dim: #7E978A;
+      --gold: #F5C451;
+      --turf: #3FCB8C;
+      --live: #FF5C68;
+    }
 
-  /* Masthead */
-  .masthead{ display:flex; flex-direction:column; gap:2px; }
-  .masthead .eyebrow{
-    margin:0; font-size:.7rem; font-weight:700; letter-spacing:.32em;
-    color:var(--gold); text-transform:uppercase;
-  }
-  .masthead h1{
-    margin:0; font-family:'Oswald',Impact,'Arial Narrow',sans-serif;
-    font-size:1.9rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
-    color:var(--text);
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* Hero / next match */
-  .next-match{
-    position:relative; overflow:hidden;
-    background:linear-gradient(160deg,var(--surface-2),var(--surface));
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:22px 18px;
-    box-shadow:0 0 0 1px rgba(245,196,81,.08), 0 18px 40px -22px rgba(0,0,0,.8);
-  }
-  .next-match::before{
-    content:""; position:absolute; inset:-40% -10% auto -10%; height:140%;
-    background:radial-gradient(circle, rgba(245,196,81,.16), transparent 65%);
-    animation:glow 6s ease-in-out infinite;
-  }
-  @keyframes glow{
-    0%,100%{ opacity:.5; transform:scale(1); }
-    50%{ opacity:1; transform:scale(1.08); }
-  }
-  .next-match h2{
-    position:relative; margin:0 0 14px; font-size:.7rem; font-weight:700;
-    letter-spacing:.32em; text-transform:uppercase; color:var(--gold);
-  }
-  .next-match__teams{ position:relative; display:flex; align-items:center; gap:14px; }
-  .next-match__team{ flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; }
-  .next-match__flag{ width:52px; height:36px; object-fit:cover; border-radius:6px; border:1px solid var(--border); }
-  .next-match__name{
-    margin:0; font-family:'Oswald',Impact,sans-serif; font-size:1.05rem;
-    font-weight:600; letter-spacing:.02em; text-transform:uppercase;
-  }
-  .next-match__center{ flex:0 0 auto; }
-  .next-match__vs{ font-family:'Oswald',Impact,sans-serif; font-size:1.4rem; font-weight:700; color:var(--text-dim); }
-  .next-match__kickoff{
-    position:relative; margin:16px 0 0; text-align:center; font-size:.8rem;
-    color:var(--text-dim); font-weight:500;
-  }
-  .next-match__kickoff time{ color:var(--text); font-weight:600; font-variant-numeric:tabular-nums; }
-  .next-match__kickoff .dot{ margin:0 6px; color:var(--border); }
-  .next-match__kickoff .tz{ margin-left:6px; font-size:.65rem; letter-spacing:.18em; color:var(--turf); }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(245, 196, 81, .08), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, Roboto, Helvetica, Arial, sans-serif;
+      padding: 18px 16px 32px;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  /* state-driven accent: gold by default, red when live */
-  .next-match{ --state:var(--gold); --state-bg:rgba(245,196,81,.16); }
-  .next-match.is-live{ --state:var(--live); --state-bg:rgba(255,92,104,.18); }
+    .page {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
 
-  .next-match::before{
-    background:radial-gradient(circle, var(--state-bg), transparent 65%);
-  }
-  .next-match.is-live::before{
-    animation:glow 2.2s ease-in-out infinite; /* faster pulse when live */
-  }
+    /* Masthead */
+    .masthead {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
 
-  .next-match h2{ color:var(--state); }
-  .next-match.is-live h2::before{
-    content:""; display:inline-block; width:7px; height:7px; border-radius:50%;
-    background:var(--live); margin-right:8px; vertical-align:middle;
-    animation:pulse 1.2s infinite;
-  }
-  .next-match.is-live{ border-color:rgba(255,92,104,.35); }
+    .masthead .eyebrow {
+      margin: 0;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .32em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
 
-  /* live score replacing VS */
-  .next-match__score{
-    font-family:'Oswald',Impact,sans-serif; font-size:1.8rem; font-weight:700;
-    font-variant-numeric:tabular-nums; color:var(--text);
-  }
-  .next-match__elapsed{
-    margin-top:4px; font-size:.65rem; font-weight:700; letter-spacing:.2em;
-    text-transform:uppercase; color:var(--live);
-  }
+    .masthead h1 {
+      margin: 0;
+      font-family: 'Oswald', Impact, 'Arial Narrow', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
 
-  /* result state */
-  .next-match.is-result{ --state:var(--turf); --state-bg:rgba(63,203,140,.12); border-color:rgba(63,203,140,.3); }
-  .next-match.is-result::before{ animation:none; opacity:.6; }
-  .next-match__ft-badge{
-    margin-top:3px; font-size:.6rem; font-weight:700; letter-spacing:.16em;
-    text-transform:uppercase; color:var(--turf);
-    background:rgba(63,203,140,.12); border-radius:99px; padding:2px 9px;
-  }
-  .next-match__scorers{
-    position:relative; margin:14px 0 0; display:flex; justify-content:space-between;
-    gap:10px; font-size:.7rem; color:var(--text-dim);
-    border-top:1px solid var(--border); padding-top:12px;
-  }
-  .next-match__scorers .home{ text-align:left; flex:1; }
-  .next-match__scorers .away{ text-align:right; flex:1; }
+    /* Hero / next match */
+    .next-match {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, var(--surface-2), var(--surface));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 18px;
+      box-shadow: 0 0 0 1px rgba(245, 196, 81, .08), 0 18px 40px -22px rgba(0, 0, 0, .8);
+    }
 
-  /* Fixtures */
-  .fixtures{ display:flex; flex-direction:column; gap:14px; }
-  .matchday-heading{
-    margin:18px 0 -2px; display:flex; align-items:center; gap:10px;
-    font-family:'Oswald',Impact,sans-serif; font-size:.85rem; font-weight:600;
-    letter-spacing:.18em; text-transform:uppercase; color:var(--text-dim);
-  }
-  .matchday-heading::after{ content:""; flex:1; height:1px; background:var(--border); }
+    .next-match::before {
+      content: "";
+      position: absolute;
+      inset: -40% -10% auto -10%;
+      height: 140%;
+      background: radial-gradient(circle, rgba(245, 196, 81, .16), transparent 65%);
+      animation: glow 6s ease-in-out infinite;
+    }
 
-  .match{
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:14px; padding:14px;
-    display:flex; flex-direction:column; gap:12px;
-  }
-  .match--next{ border-color:rgba(245,196,81,.4); box-shadow:0 0 0 1px rgba(245,196,81,.1); }
-  .match--live{ border-color:rgba(255,92,104,.4); box-shadow:0 0 0 1px rgba(255,92,104,.12); }
-  .match--finished{ opacity:.7; }
+    @keyframes glow {
 
-  .match__meta{
-    display:flex; justify-content:space-between; align-items:center;
-    font-size:.68rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim);
-  }
-  .match__group{ color:var(--turf); }
-  .match__time{ font-variant-numeric:tabular-nums; }
+      0%,
+      100% {
+        opacity: .5;
+        transform: scale(1);
+      }
 
-  .match__body{ display:flex; align-items:center; gap:8px; }
-  .match__team{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; min-width:0; }
-  .match__team img{ width:46px; height:30px; object-fit:cover; border-radius:5px; border:1px solid var(--border); }
-  .match__team-name{ font-size:.78rem; font-weight:600; line-height:1.2; }
-  .match__score{ flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:64px; }
-  .match__score-value{ font-family:'Oswald',Impact,sans-serif; font-size:1.6rem; font-weight:700; font-variant-numeric:tabular-nums; }
-  .match__vs{ font-family:'Oswald',Impact,sans-serif; font-size:1.1rem; font-weight:600; color:var(--text-dim); }
-  .match__badge{ font-size:.6rem; font-weight:700; letter-spacing:.14em; padding:2px 8px; border-radius:99px; text-transform:uppercase; }
-  .match__badge--live{ background:rgba(255,92,104,.15); color:var(--live); }
-  .match__badge--live::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--live); margin-right:5px; animation:pulse 1.4s infinite; }
-  .match__badge--ft{ background:rgba(255,255,255,.06); color:var(--text-dim); }
-  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+      50% {
+        opacity: 1;
+        transform: scale(1.08);
+      }
+    }
 
-  .match__scorers{ margin:0; display:flex; justify-content:space-between; gap:10px; font-size:.68rem; color:var(--text-dim); border-top:1px solid var(--border); padding-top:10px; }
-  .match__scorers .home, .match__scorers .away{ width:50%; }
-  .match__scorers .away{ text-align:right; }
+    .next-match h2 {
+      position: relative;
+      margin: 0 0 14px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
 
-  .match__venue{ margin:0; font-size:.68rem; color:var(--text-dim); }
-</style>
+    .next-match__teams {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-<div class="page">
-  <header class="masthead">
-    <p class="eyebrow">FIFA</p>
-    <h1>World Cup 2026</h1>
-  </header><section class="next-match is-result">
-    <h2>Full Time</h2>
-    <div class="next-match__teams">
-      <div class="next-match__team">
-        <img class="next-match__flag" src="https://flagcdn.com/w80/us.png" alt="">
-        <p class="next-match__name">United States</p>
-      </div>
-      <div class="next-match__center">
+    .next-match__team {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .next-match__flag {
+      width: 52px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .next-match__name {
+      margin: 0;
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .next-match__center {
+      flex: 0 0 auto;
+    }
+
+    .next-match__vs {
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+
+    .next-match__kickoff {
+      position: relative;
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: .8rem;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .next-match__kickoff time {
+      color: var(--text);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .next-match__kickoff .dot {
+      margin: 0 6px;
+      color: var(--border);
+    }
+
+    .next-match__kickoff .tz {
+      margin-left: 6px;
+      font-size: .65rem;
+      letter-spacing: .18em;
+      color: var(--turf);
+    }
+
+    /* state-driven accent: gold by default, red when live */
+    .next-match {
+      --state: var(--gold);
+      --state-bg: rgba(245, 196, 81, .16);
+    }
+
+    .next-match.is-live {
+      --state: var(--live);
+      --state-bg: rgba(255, 92, 104, .18);
+    }
+
+    .next-match::before {
+      background: radial-gradient(circle, var(--state-bg), transparent 65%);
+    }
+
+    .next-match.is-live::before {
+      animation: glow 2.2s ease-in-out infinite;
+      /* faster pulse when live */
+    }
+
+    .next-match h2 {
+      color: var(--state);
+    }
+
+    .next-match.is-live h2::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--live);
+      margin-right: 8px;
+      vertical-align: middle;
+      animation: pulse 1.2s infinite;
+    }
+
+    .next-match.is-live {
+      border-color: rgba(255, 92, 104, .35);
+    }
+
+    /* live score replacing VS */
+    .next-match__score {
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+
+    .next-match__elapsed {
+      margin-top: 4px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--live);
+    }
+
+    /* result state */
+    .next-match.is-result {
+      --state: var(--turf);
+      --state-bg: rgba(63, 203, 140, .12);
+      border-color: rgba(63, 203, 140, .3);
+    }
+
+    .next-match.is-result::before {
+      animation: none;
+      opacity: .6;
+    }
+
+    .next-match__ft-badge {
+      margin-top: 3px;
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--turf);
+      background: rgba(63, 203, 140, .12);
+      border-radius: 99px;
+      padding: 2px 9px;
+    }
+
+    .next-match__scorers {
+      position: relative;
+      margin: 14px 0 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .7rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .next-match__scorers .home {
+      text-align: left;
+      flex: 1;
+    }
+
+    .next-match__scorers .away {
+      text-align: right;
+      flex: 1;
+    }
+
+    /* Fixtures */
+    .fixtures {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .matchday-heading {
+      margin: 18px 0 -2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .matchday-heading::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .match {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .match--next {
+      border-color: rgba(245, 196, 81, .4);
+      box-shadow: 0 0 0 1px rgba(245, 196, 81, .1);
+    }
+
+    .match--live {
+      border-color: rgba(255, 92, 104, .4);
+      box-shadow: 0 0 0 1px rgba(255, 92, 104, .12);
+    }
+
+    .match--finished {
+      opacity: .7;
+    }
+
+    .match__meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .match__group {
+      color: var(--turf);
+    }
+
+    .match__time {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .match__body {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .match__team {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .match__team img {
+      width: 46px;
+      height: 30px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+    }
+
+    .match__team-name {
+      font-size: .78rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .match__score {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 64px;
+    }
+
+    .match__score-value {
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .match__vs {
+      font-family: 'Oswald', Impact, sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    .match__badge {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .match__badge--live {
+      background: rgba(255, 92, 104, .15);
+      color: var(--live);
+    }
+
+    .match__badge--live::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+      margin-right: 5px;
+      animation: pulse 1.4s infinite;
+    }
+
+    .match__badge--ft {
+      background: rgba(255, 255, 255, .06);
+      color: var(--text-dim);
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .25;
+      }
+    }
+
+    .match__scorers {
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .68rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+
+    .match__scorers .home,
+    .match__scorers .away {
+      width: 50%;
+    }
+
+    .match__scorers .away {
+      text-align: right;
+    }
+
+    .match__venue {
+      margin: 0;
+      font-size: .68rem;
+      color: var(--text-dim);
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="page">
+    <header class="masthead">
+      <p class="eyebrow">FIFA</p>
+      <h1>World Cup 2026</h1>
+    </header>
+<section class="next-match is-result">
+  <h2>Full Time</h2>
+  <div class="next-match__teams">
+    <div class="next-match__team">
+      <img class="next-match__flag" src="https://flagcdn.com/w80/us.png" alt="">
+      <p class="next-match__name">United States</p>
+    </div>
+    <div class="next-match__center">
        <span class="next-match__score">0 - 0</span>
        <span class="next-match__ft-badge">FT</span>
      </div>
-      <div class="next-match__team">
-        <img class="next-match__flag" src="https://flagcdn.com/w80/au.png" alt="">
-        <p class="next-match__name">Australia</p>
-      </div>
+    <div class="next-match__team">
+      <img class="next-match__flag" src="https://flagcdn.com/w80/au.png" alt="">
+      <p class="next-match__name">Australia</p>
     </div>
-    
-    
-  </section>
+  </div>
+  
+  
+</section>
 
-  <main class="fixtures"><h2 class="matchday-heading"><span>Matchday 1</span></h2><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 12, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/mx.png" alt="">
-        <span class="match__team-name">Mexico</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">2 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/za.png" alt="">
-        <span class="match__team-name">South Africa</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ “J. Quiñones 9'”, ”R. Jiménez 67'”</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">Estadio Azteca, Mexico City</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 12, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/kr.png" alt="">
-        <span class="match__team-name">South Korea</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">2 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cz.png" alt="">
-        <span class="match__team-name">Czech Republic</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ I.B. Hwang 67', H.G. Oh 80'</span>
-      <span class="away">L. Krejčí 59' ⚽</span>
-    </p>
-    <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 13, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ca.png" alt="">
-        <span class="match__team-name">Canada</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ba.png" alt="">
-        <span class="match__team-name">Bosnia and Herzegovina</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ C. Larin 11'</span>
-      <span class="away">Jovo Lukić 21' ⚽</span>
-    </p>
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 13, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/us.png" alt="">
-        <span class="match__team-name">United States</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">4 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/py.png" alt="">
-        <span class="match__team-name">Paraguay</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ D. Bobadilla 7'(OG), F. Balogun 31', F. Balogun 45'+5', G. Reyna 90'+8'</span>
-      <span class="away">Maurício 73' ⚽</span>
-    </p>
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 14, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/qa.png" alt="">
-        <span class="match__team-name">Qatar</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ch.png" alt="">
-        <span class="match__team-name">Switzerland</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ B. Khoukhi 90'+5'</span>
-      <span class="away">Breel Embolo 17' (p) ⚽</span>
-    </p>
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 14, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/br.png" alt="">
-        <span class="match__team-name">Brazil</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ma.png" alt="">
-        <span class="match__team-name">Morocco</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ V. Júnior 32'</span>
-      <span class="away">I. Saibari 21' ⚽</span>
-    </p>
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 14, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ht.png" alt="">
-        <span class="match__team-name">Haiti</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">0 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
-        <span class="match__team-name">Scotland</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home"></span>
-      <span class="away">J. McGinn 28' ⚽</span>
-    </p>
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 14, 10:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/au.png" alt="">
-        <span class="match__team-name">Australia</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">2 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tr.png" alt="">
-        <span class="match__team-name">Turkey</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Nestory Irankunda 27', C. Metcalfe 75'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 14, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/de.png" alt="">
-        <span class="match__team-name">Germany</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">7 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cw.png" alt="">
-        <span class="match__team-name">Curaçao</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Felix Nmecha 7', N. Schlotterbeck 38', K. Havertz 45'+5'(p), J. Musiala 47', N. Brown 68', D. Undav 78', K. Havertz 88'</span>
-      <span class="away">L. Comenencia 21' ⚽</span>
-    </p>
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 15, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nl.png" alt="">
-        <span class="match__team-name">Netherlands</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">2 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jp.png" alt="">
-        <span class="match__team-name">Japan</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Virgil van Dijk 51', C. Summerville 64'</span>
-      <span class="away">K. Nakamura 57', K. Ogawa 89' ⚽</span>
-    </p>
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 15, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ci.png" alt="">
-        <span class="match__team-name">Ivory Coast</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ec.png" alt="">
-        <span class="match__team-name">Ecuador</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ A. Diallo 90'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 15, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/se.png" alt="">
-        <span class="match__team-name">Sweden</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">5 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tn.png" alt="">
-        <span class="match__team-name">Tunisia</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Y.Ayari 7', A. Isak 30', V. Gyökeres 59', M. Svanberg 84', Y.Ayari 90'+6'</span>
-      <span class="away">O. Rekik 43' ⚽</span>
-    </p>
-    <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 15, 10:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/es.png" alt="">
-        <span class="match__team-name">Spain</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">0 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cv.png" alt="">
-        <span class="match__team-name">Cape Verde</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 16, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/be.png" alt="">
-        <span class="match__team-name">Belgium</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/eg.png" alt="">
-        <span class="match__team-name">Egypt</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Mohamed Hany 66'</span>
-      <span class="away">Emam Ashour 20' ⚽</span>
-    </p>
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 16, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ir.png" alt="">
-        <span class="match__team-name">Iran</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">2 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nz.png" alt="">
-        <span class="match__team-name">New Zealand</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Ramin Rezaiian 32', Mohammad Mohebi 64'</span>
-      <span class="away">Elijah Just 7', Elijah Just 54' ⚽</span>
-    </p>
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 16, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sa.png" alt="">
-        <span class="match__team-name">Saudi Arabia</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uy.png" alt="">
-        <span class="match__team-name">Uruguay</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Abdulelah Al-Amri 41'</span>
-      <span class="away">Maximiliano Araújo 80' ⚽</span>
-    </p>
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 17, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/fr.png" alt="">
-        <span class="match__team-name">France</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">3 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sn.png" alt="">
-        <span class="match__team-name">Senegal</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ K. Mbappé 66', B. Barcola 82', K. Mbappé 90+6'</span>
-      <span class="away">I. Mbaye 90+5' ⚽</span>
-    </p>
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 17, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/iq.png" alt="">
-        <span class="match__team-name">Iraq</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 4</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/no.png" alt="">
-        <span class="match__team-name">Norway</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Aymen Hussein 39'</span>
-      <span class="away">Erling Haaland 29', Erling Haaland 43', Leo Østigård 76', Aymen Hussein 90+7' ⚽</span>
-    </p>
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 17, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ar.png" alt="">
-        <span class="match__team-name">Argentina</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">3 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/dz.png" alt="">
-        <span class="match__team-name">Algeria</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Lionel Messi 17', Lionel Messi 60', Lionel Messi 76'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 17, 10:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/at.png" alt="">
-        <span class="match__team-name">Austria</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">3 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jo.png" alt="">
-        <span class="match__team-name">Jordan</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Rvmanv Ashmid 21', Izn Alarb 76'</span>
-      <span class="away">Ali Avlvan 50' ⚽</span>
-    </p>
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 17, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pt.png" alt="">
-        <span class="match__team-name">Portugal</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cd.png" alt="">
-        <span class="match__team-name">Democratic Republic of the Congo</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ J. Neves 6'</span>
-      <span class="away">Y. Wissa 45+5' ⚽</span>
-    </p>
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 18, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
-        <span class="match__team-name">England</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">4 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/hr.png" alt="">
-        <span class="match__team-name">Croatia</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ H. Kane 12'(p), H. Kane 42', J. Bellingham 47', M. Rashford 85'</span>
-      <span class="away">M. Baturina 36', P. Musa 45+5' ⚽</span>
-    </p>
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 18, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gh.png" alt="">
-        <span class="match__team-name">Ghana</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pa.png" alt="">
-        <span class="match__team-name">Panama</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Kalb Iirnki 90+5'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 18, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uz.png" alt="">
-        <span class="match__team-name">Uzbekistan</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 3</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/co.png" alt="">
-        <span class="match__team-name">Colombia</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Abas Bk Fiz Allh Af 60'</span>
-      <span class="away">Dnil Mvnvz 40', Lviiz Diaz 65', Khamintvn Kampaz 90+9' ⚽</span>
-    </p>
-    <p class="match__venue">Estadio Azteca, Mexico City</p>
-  </article><h2 class="matchday-heading"><span>Matchday 2</span></h2><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 19, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ch.png" alt="">
-        <span class="match__team-name">Switzerland</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">4 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ba.png" alt="">
-        <span class="match__team-name">Bosnia and Herzegovina</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Jvhan Mnzambi 74', Rvbn Vargas 84', Jvhan Mnzambi 90'</span>
-      <span class="away">Armin Mhmich 90+3' ⚽</span>
-    </p>
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 18, 10:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cz.png" alt="">
-        <span class="match__team-name">Czech Republic</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/za.png" alt="">
-        <span class="match__team-name">South Africa</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ ‫mikhal Sadilk 6'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 19, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ca.png" alt="">
-        <span class="match__team-name">Canada</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">6 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/qa.png" alt="">
-        <span class="match__team-name">Qatar</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Kail Larin 16', Jonathan David 29', Jonathan David 45+3', Nathan Saliba 64', Mohamed Almnai 75', Jonathan David 90+2'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match match--finished">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 19, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/mx.png" alt="">
-        <span class="match__team-name">Mexico</span>
-      </div>
-      <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/kr.png" alt="">
-        <span class="match__team-name">South Korea</span>
-      </div>
-    </div>
-    <p class="match__scorers">
-      <span class="home">⚽ Luis Romo 50'</span>
-      <span class="away"></span>
-    </p>
-    <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
-  </article><article class="match match--next">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 20, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/us.png" alt="">
-        <span class="match__team-name">United States</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/au.png" alt="">
-        <span class="match__team-name">Australia</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 20, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
-        <span class="match__team-name">Scotland</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ma.png" alt="">
-        <span class="match__team-name">Morocco</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 20, 09:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tr.png" alt="">
-        <span class="match__team-name">Turkey</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/py.png" alt="">
-        <span class="match__team-name">Paraguay</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 20, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/br.png" alt="">
-        <span class="match__team-name">Brazil</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ht.png" alt="">
-        <span class="match__team-name">Haiti</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 20, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nl.png" alt="">
-        <span class="match__team-name">Netherlands</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/se.png" alt="">
-        <span class="match__team-name">Sweden</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 21, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/de.png" alt="">
-        <span class="match__team-name">Germany</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ci.png" alt="">
-        <span class="match__team-name">Ivory Coast</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 21, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ec.png" alt="">
-        <span class="match__team-name">Ecuador</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cw.png" alt="">
-        <span class="match__team-name">Curaçao</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 21, 10:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tn.png" alt="">
-        <span class="match__team-name">Tunisia</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jp.png" alt="">
-        <span class="match__team-name">Japan</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 22, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/be.png" alt="">
-        <span class="match__team-name">Belgium</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ir.png" alt="">
-        <span class="match__team-name">Iran</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 21, 10:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/es.png" alt="">
-        <span class="match__team-name">Spain</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sa.png" alt="">
-        <span class="match__team-name">Saudi Arabia</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 22, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nz.png" alt="">
-        <span class="match__team-name">New Zealand</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/eg.png" alt="">
-        <span class="match__team-name">Egypt</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 22, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uy.png" alt="">
-        <span class="match__team-name">Uruguay</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cv.png" alt="">
-        <span class="match__team-name">Cape Verde</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 22, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ar.png" alt="">
-        <span class="match__team-name">Argentina</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/at.png" alt="">
-        <span class="match__team-name">Austria</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 23, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/fr.png" alt="">
-        <span class="match__team-name">France</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/iq.png" alt="">
-        <span class="match__team-name">Iraq</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 23, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/no.png" alt="">
-        <span class="match__team-name">Norway</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sn.png" alt="">
-        <span class="match__team-name">Senegal</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 23, 09:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jo.png" alt="">
-        <span class="match__team-name">Jordan</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/dz.png" alt="">
-        <span class="match__team-name">Algeria</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 23, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pt.png" alt="">
-        <span class="match__team-name">Portugal</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uz.png" alt="">
-        <span class="match__team-name">Uzbekistan</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 24, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
-        <span class="match__team-name">England</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gh.png" alt="">
-        <span class="match__team-name">Ghana</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 24, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pa.png" alt="">
-        <span class="match__team-name">Panama</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/hr.png" alt="">
-        <span class="match__team-name">Croatia</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 24, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/co.png" alt="">
-        <span class="match__team-name">Colombia</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cd.png" alt="">
-        <span class="match__team-name">Democratic Republic of the Congo</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
-  </article><h2 class="matchday-heading"><span>Matchday 3</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 25, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ba.png" alt="">
-        <span class="match__team-name">Bosnia and Herzegovina</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/qa.png" alt="">
-        <span class="match__team-name">Qatar</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group B</span>
-      <time class="match__time">Jun 25, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ch.png" alt="">
-        <span class="match__team-name">Switzerland</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ca.png" alt="">
-        <span class="match__team-name">Canada</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 25, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
-        <span class="match__team-name">Scotland</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/br.png" alt="">
-        <span class="match__team-name">Brazil</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group C</span>
-      <time class="match__time">Jun 25, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ma.png" alt="">
-        <span class="match__team-name">Morocco</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ht.png" alt="">
-        <span class="match__team-name">Haiti</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 25, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/za.png" alt="">
-        <span class="match__team-name">South Africa</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/kr.png" alt="">
-        <span class="match__team-name">South Korea</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group A</span>
-      <time class="match__time">Jun 25, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cz.png" alt="">
-        <span class="match__team-name">Czech Republic</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/mx.png" alt="">
-        <span class="match__team-name">Mexico</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio Azteca, Mexico City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 26, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cw.png" alt="">
-        <span class="match__team-name">Curaçao</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ci.png" alt="">
-        <span class="match__team-name">Ivory Coast</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group E</span>
-      <time class="match__time">Jun 26, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ec.png" alt="">
-        <span class="match__team-name">Ecuador</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/de.png" alt="">
-        <span class="match__team-name">Germany</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 26, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jp.png" alt="">
-        <span class="match__team-name">Japan</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/se.png" alt="">
-        <span class="match__team-name">Sweden</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group F</span>
-      <time class="match__time">Jun 26, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tn.png" alt="">
-        <span class="match__team-name">Tunisia</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nl.png" alt="">
-        <span class="match__team-name">Netherlands</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 26, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/py.png" alt="">
-        <span class="match__team-name">Paraguay</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/au.png" alt="">
-        <span class="match__team-name">Australia</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group D</span>
-      <time class="match__time">Jun 26, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/tr.png" alt="">
-        <span class="match__team-name">Turkey</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/us.png" alt="">
-        <span class="match__team-name">United States</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 27, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sn.png" alt="">
-        <span class="match__team-name">Senegal</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/iq.png" alt="">
-        <span class="match__team-name">Iraq</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group I</span>
-      <time class="match__time">Jun 27, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/no.png" alt="">
-        <span class="match__team-name">Norway</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/fr.png" alt="">
-        <span class="match__team-name">France</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 27, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uy.png" alt="">
-        <span class="match__team-name">Uruguay</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/es.png" alt="">
-        <span class="match__team-name">Spain</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group H</span>
-      <time class="match__time">Jun 27, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cv.png" alt="">
-        <span class="match__team-name">Cape Verde</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/sa.png" alt="">
-        <span class="match__team-name">Saudi Arabia</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 27, 09:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/eg.png" alt="">
-        <span class="match__team-name">Egypt</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ir.png" alt="">
-        <span class="match__team-name">Iran</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group G</span>
-      <time class="match__time">Jun 27, 09:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/nz.png" alt="">
-        <span class="match__team-name">New Zealand</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/be.png" alt="">
-        <span class="match__team-name">Belgium</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 28, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pa.png" alt="">
-        <span class="match__team-name">Panama</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
-        <span class="match__team-name">England</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group L</span>
-      <time class="match__time">Jun 28, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/hr.png" alt="">
-        <span class="match__team-name">Croatia</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/gh.png" alt="">
-        <span class="match__team-name">Ghana</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 28, 05:30 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/co.png" alt="">
-        <span class="match__team-name">Colombia</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/pt.png" alt="">
-        <span class="match__team-name">Portugal</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group K</span>
-      <time class="match__time">Jun 28, 05:30 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/cd.png" alt="">
-        <span class="match__team-name">Democratic Republic of the Congo</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/uz.png" alt="">
-        <span class="match__team-name">Uzbekistan</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 28, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/dz.png" alt="">
-        <span class="match__team-name">Algeria</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/at.png" alt="">
-        <span class="match__team-name">Austria</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group J</span>
-      <time class="match__time">Jun 28, 08:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/jo.png" alt="">
-        <span class="match__team-name">Jordan</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://flagcdn.com/w80/ar.png" alt="">
-        <span class="match__team-name">Argentina</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><h2 class="matchday-heading"><span>Matchday 4</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jun 29, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group A</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group B</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jun 29, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group C</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group F</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jun 30, 02:30 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group E</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group A/B/C/D/F</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jun 30, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group F</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group C</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jun 30, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group E</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group I</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 01, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group I</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group C/D/F/G/H</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 01, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group A</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group C/E/F/H/I</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio Azteca, Mexico City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 01, 10:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group L</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group E/H/I/J/K</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 02, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group G</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group A/E/H/I/J</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 02, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group D</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group B/E/F/I/J</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 03, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group H</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group J</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 03, 05:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group K</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group L</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BMO Field, Toronto</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 03, 09:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group B</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group E/F/G/I/J</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 04, 12:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group D</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group G</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 04, 04:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group J</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Runner-up Group H</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R32</span>
-      <time class="match__time">Jul 04, 07:30 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Group K</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">3rd Group D/E/I/J/L</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><h2 class="matchday-heading"><span>Matchday 5</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 04, 11:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 73</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 75</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">NRG Stadium, Houston</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 05, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 74</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 77</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 06, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 76</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 78</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 06, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 79</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 80</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Estadio Azteca, Mexico City</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 07, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 83</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 84</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 07, 06:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 81</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 82</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Lumen Field, Seattle</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 07, 10:00 PM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 86</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 88</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group R16</span>
-      <time class="match__time">Jul 08, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 85</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 87</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">BC Place, Vancouver</p>
-  </article><h2 class="matchday-heading"><span>Matchday 6</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group QF</span>
-      <time class="match__time">Jul 10, 02:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 89</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 90</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group QF</span>
-      <time class="match__time">Jul 11, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 93</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 94</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group QF</span>
-      <time class="match__time">Jul 12, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 91</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 92</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group QF</span>
-      <time class="match__time">Jul 12, 07:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 95</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 96</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
-  </article><h2 class="matchday-heading"><span>Matchday 7</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group SF</span>
-      <time class="match__time">Jul 15, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 97</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 98</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
-  </article><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group SF</span>
-      <time class="match__time">Jul 16, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 99</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 100</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
-  </article><h2 class="matchday-heading"><span>Matchday 8</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group 3RD</span>
-      <time class="match__time">Jul 19, 03:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Loser Match 101</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Loser Match 102</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
-  </article><h2 class="matchday-heading"><span>Matchday 9</span></h2><article class="match ">
-    <header class="match__meta">
-      <span class="match__group">Group FINAL</span>
-      <time class="match__time">Jul 20, 01:00 AM</time>
-    </header>
-    <div class="match__body">
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 101</span>
-      </div>
-      <div class="match__score"><span class="match__vs">VS</span></div>
-      <div class="match__team">
-        <img src="https://placehold.co/60x40?text=Flag" alt="">
-        <span class="match__team-name">Winner Match 102</span>
-      </div>
-    </div>
-    
-    <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
-  </article></main></div>
+<main class="fixtures"><h2 class="matchday-heading"><span>Matchday 1</span></h2>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 12, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/mx.png" alt="">
+      <span class="match__team-name">Mexico</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">2 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/za.png" alt="">
+      <span class="match__team-name">South Africa</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ “J. Quiñones 9'”, ”R. Jiménez 67'”</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">Estadio Azteca, Mexico City</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 12, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/kr.png" alt="">
+      <span class="match__team-name">South Korea</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">2 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cz.png" alt="">
+      <span class="match__team-name">Czech Republic</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ I.B. Hwang 67', H.G. Oh 80'</span>
+    <span class="away">L. Krejčí 59' ⚽</span>
+  </p>
+  <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 13, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ca.png" alt="">
+      <span class="match__team-name">Canada</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ba.png" alt="">
+      <span class="match__team-name">Bosnia and Herzegovina</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ C. Larin 11'</span>
+    <span class="away">Jovo Lukić 21' ⚽</span>
+  </p>
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 13, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/us.png" alt="">
+      <span class="match__team-name">United States</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">4 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/py.png" alt="">
+      <span class="match__team-name">Paraguay</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ D. Bobadilla 7'(OG), F. Balogun 31', F. Balogun 45'+5', G. Reyna 90'+8'</span>
+    <span class="away">Maurício 73' ⚽</span>
+  </p>
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 14, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/qa.png" alt="">
+      <span class="match__team-name">Qatar</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ch.png" alt="">
+      <span class="match__team-name">Switzerland</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ B. Khoukhi 90'+5'</span>
+    <span class="away">Breel Embolo 17' (p) ⚽</span>
+  </p>
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 14, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/br.png" alt="">
+      <span class="match__team-name">Brazil</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ma.png" alt="">
+      <span class="match__team-name">Morocco</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ V. Júnior 32'</span>
+    <span class="away">I. Saibari 21' ⚽</span>
+  </p>
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 14, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ht.png" alt="">
+      <span class="match__team-name">Haiti</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">0 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
+      <span class="match__team-name">Scotland</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home"></span>
+    <span class="away">J. McGinn 28' ⚽</span>
+  </p>
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 14, 10:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/au.png" alt="">
+      <span class="match__team-name">Australia</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">2 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tr.png" alt="">
+      <span class="match__team-name">Turkey</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Nestory Irankunda 27', C. Metcalfe 75'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 14, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/de.png" alt="">
+      <span class="match__team-name">Germany</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">7 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cw.png" alt="">
+      <span class="match__team-name">Curaçao</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Felix Nmecha 7', N. Schlotterbeck 38', K. Havertz 45'+5'(p), J. Musiala 47', N. Brown 68', D. Undav 78', K. Havertz 88'</span>
+    <span class="away">L. Comenencia 21' ⚽</span>
+  </p>
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 15, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nl.png" alt="">
+      <span class="match__team-name">Netherlands</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">2 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jp.png" alt="">
+      <span class="match__team-name">Japan</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Virgil van Dijk 51', C. Summerville 64'</span>
+    <span class="away">K. Nakamura 57', K. Ogawa 89' ⚽</span>
+  </p>
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 15, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ci.png" alt="">
+      <span class="match__team-name">Ivory Coast</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ec.png" alt="">
+      <span class="match__team-name">Ecuador</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ A. Diallo 90'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 15, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/se.png" alt="">
+      <span class="match__team-name">Sweden</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">5 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tn.png" alt="">
+      <span class="match__team-name">Tunisia</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Y.Ayari 7', A. Isak 30', V. Gyökeres 59', M. Svanberg 84', Y.Ayari 90'+6'</span>
+    <span class="away">O. Rekik 43' ⚽</span>
+  </p>
+  <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 15, 10:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/es.png" alt="">
+      <span class="match__team-name">Spain</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">0 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cv.png" alt="">
+      <span class="match__team-name">Cape Verde</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 16, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/be.png" alt="">
+      <span class="match__team-name">Belgium</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/eg.png" alt="">
+      <span class="match__team-name">Egypt</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Mohamed Hany 66'</span>
+    <span class="away">Emam Ashour 20' ⚽</span>
+  </p>
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 16, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ir.png" alt="">
+      <span class="match__team-name">Iran</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">2 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nz.png" alt="">
+      <span class="match__team-name">New Zealand</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Ramin Rezaiian 32', Mohammad Mohebi 64'</span>
+    <span class="away">Elijah Just 7', Elijah Just 54' ⚽</span>
+  </p>
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 16, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sa.png" alt="">
+      <span class="match__team-name">Saudi Arabia</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uy.png" alt="">
+      <span class="match__team-name">Uruguay</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Abdulelah Al-Amri 41'</span>
+    <span class="away">Maximiliano Araújo 80' ⚽</span>
+  </p>
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 17, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/fr.png" alt="">
+      <span class="match__team-name">France</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">3 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sn.png" alt="">
+      <span class="match__team-name">Senegal</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ K. Mbappé 66', B. Barcola 82', K. Mbappé 90+6'</span>
+    <span class="away">I. Mbaye 90+5' ⚽</span>
+  </p>
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 17, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/iq.png" alt="">
+      <span class="match__team-name">Iraq</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 4</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/no.png" alt="">
+      <span class="match__team-name">Norway</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Aymen Hussein 39'</span>
+    <span class="away">Erling Haaland 29', Erling Haaland 43', Leo Østigård 76', Aymen Hussein 90+7' ⚽</span>
+  </p>
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 17, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ar.png" alt="">
+      <span class="match__team-name">Argentina</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">3 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/dz.png" alt="">
+      <span class="match__team-name">Algeria</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Lionel Messi 17', Lionel Messi 60', Lionel Messi 76'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 17, 10:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/at.png" alt="">
+      <span class="match__team-name">Austria</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">3 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jo.png" alt="">
+      <span class="match__team-name">Jordan</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Rvmanv Ashmid 21', Izn Alarb 76'</span>
+    <span class="away">Ali Avlvan 50' ⚽</span>
+  </p>
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 17, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pt.png" alt="">
+      <span class="match__team-name">Portugal</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cd.png" alt="">
+      <span class="match__team-name">Democratic Republic of the Congo</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ J. Neves 6'</span>
+    <span class="away">Y. Wissa 45+5' ⚽</span>
+  </p>
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 18, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
+      <span class="match__team-name">England</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">4 - 2</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/hr.png" alt="">
+      <span class="match__team-name">Croatia</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ H. Kane 12'(p), H. Kane 42', J. Bellingham 47', M. Rashford 85'</span>
+    <span class="away">M. Baturina 36', P. Musa 45+5' ⚽</span>
+  </p>
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 18, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gh.png" alt="">
+      <span class="match__team-name">Ghana</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pa.png" alt="">
+      <span class="match__team-name">Panama</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Kalb Iirnki 90+5'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 18, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uz.png" alt="">
+      <span class="match__team-name">Uzbekistan</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 3</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/co.png" alt="">
+      <span class="match__team-name">Colombia</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Abas Bk Fiz Allh Af 60'</span>
+    <span class="away">Dnil Mvnvz 40', Lviiz Diaz 65', Khamintvn Kampaz 90+9' ⚽</span>
+  </p>
+  <p class="match__venue">Estadio Azteca, Mexico City</p>
+</article><h2 class="matchday-heading"><span>Matchday 2</span></h2>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 19, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ch.png" alt="">
+      <span class="match__team-name">Switzerland</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">4 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ba.png" alt="">
+      <span class="match__team-name">Bosnia and Herzegovina</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Jvhan Mnzambi 74', Rvbn Vargas 84', Jvhan Mnzambi 90'</span>
+    <span class="away">Armin Mhmich 90+3' ⚽</span>
+  </p>
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 18, 10:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cz.png" alt="">
+      <span class="match__team-name">Czech Republic</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 1</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/za.png" alt="">
+      <span class="match__team-name">South Africa</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ ‫mikhal Sadilk 6'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 19, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ca.png" alt="">
+      <span class="match__team-name">Canada</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">6 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/qa.png" alt="">
+      <span class="match__team-name">Qatar</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Kail Larin 16', Jonathan David 29', Jonathan David 45+3', Nathan Saliba 64', Mohamed Almnai 75', Jonathan David 90+2'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match match--finished">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 19, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/mx.png" alt="">
+      <span class="match__team-name">Mexico</span>
+    </div>
+    <div class="match__score"><span class="match__score-value">1 - 0</span><span class="match__badge match__badge--ft">Full Time</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/kr.png" alt="">
+      <span class="match__team-name">South Korea</span>
+    </div>
+  </div>
+  <p class="match__scorers">
+    <span class="home">⚽ Luis Romo 50'</span>
+    <span class="away"></span>
+  </p>
+  <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
+</article>
+<article class="match match--next">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 20, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/us.png" alt="">
+      <span class="match__team-name">United States</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/au.png" alt="">
+      <span class="match__team-name">Australia</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 20, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
+      <span class="match__team-name">Scotland</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ma.png" alt="">
+      <span class="match__team-name">Morocco</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 20, 09:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tr.png" alt="">
+      <span class="match__team-name">Turkey</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/py.png" alt="">
+      <span class="match__team-name">Paraguay</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 20, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/br.png" alt="">
+      <span class="match__team-name">Brazil</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ht.png" alt="">
+      <span class="match__team-name">Haiti</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 20, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nl.png" alt="">
+      <span class="match__team-name">Netherlands</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/se.png" alt="">
+      <span class="match__team-name">Sweden</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 21, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/de.png" alt="">
+      <span class="match__team-name">Germany</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ci.png" alt="">
+      <span class="match__team-name">Ivory Coast</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 21, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ec.png" alt="">
+      <span class="match__team-name">Ecuador</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cw.png" alt="">
+      <span class="match__team-name">Curaçao</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 21, 10:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tn.png" alt="">
+      <span class="match__team-name">Tunisia</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jp.png" alt="">
+      <span class="match__team-name">Japan</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 22, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/be.png" alt="">
+      <span class="match__team-name">Belgium</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ir.png" alt="">
+      <span class="match__team-name">Iran</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 21, 10:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/es.png" alt="">
+      <span class="match__team-name">Spain</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sa.png" alt="">
+      <span class="match__team-name">Saudi Arabia</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 22, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nz.png" alt="">
+      <span class="match__team-name">New Zealand</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/eg.png" alt="">
+      <span class="match__team-name">Egypt</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 22, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uy.png" alt="">
+      <span class="match__team-name">Uruguay</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cv.png" alt="">
+      <span class="match__team-name">Cape Verde</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 22, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ar.png" alt="">
+      <span class="match__team-name">Argentina</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/at.png" alt="">
+      <span class="match__team-name">Austria</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 23, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/fr.png" alt="">
+      <span class="match__team-name">France</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/iq.png" alt="">
+      <span class="match__team-name">Iraq</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 23, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/no.png" alt="">
+      <span class="match__team-name">Norway</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sn.png" alt="">
+      <span class="match__team-name">Senegal</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 23, 09:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jo.png" alt="">
+      <span class="match__team-name">Jordan</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/dz.png" alt="">
+      <span class="match__team-name">Algeria</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 23, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pt.png" alt="">
+      <span class="match__team-name">Portugal</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uz.png" alt="">
+      <span class="match__team-name">Uzbekistan</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 24, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
+      <span class="match__team-name">England</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gh.png" alt="">
+      <span class="match__team-name">Ghana</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 24, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pa.png" alt="">
+      <span class="match__team-name">Panama</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/hr.png" alt="">
+      <span class="match__team-name">Croatia</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 24, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/co.png" alt="">
+      <span class="match__team-name">Colombia</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cd.png" alt="">
+      <span class="match__team-name">Democratic Republic of the Congo</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
+</article><h2 class="matchday-heading"><span>Matchday 3</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 25, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ba.png" alt="">
+      <span class="match__team-name">Bosnia and Herzegovina</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/qa.png" alt="">
+      <span class="match__team-name">Qatar</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group B</span>
+    <time class="match__time">Jun 25, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ch.png" alt="">
+      <span class="match__team-name">Switzerland</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ca.png" alt="">
+      <span class="match__team-name">Canada</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 25, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-sct.png" alt="">
+      <span class="match__team-name">Scotland</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/br.png" alt="">
+      <span class="match__team-name">Brazil</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group C</span>
+    <time class="match__time">Jun 25, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ma.png" alt="">
+      <span class="match__team-name">Morocco</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ht.png" alt="">
+      <span class="match__team-name">Haiti</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 25, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/za.png" alt="">
+      <span class="match__team-name">South Africa</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/kr.png" alt="">
+      <span class="match__team-name">South Korea</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group A</span>
+    <time class="match__time">Jun 25, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cz.png" alt="">
+      <span class="match__team-name">Czech Republic</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/mx.png" alt="">
+      <span class="match__team-name">Mexico</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio Azteca, Mexico City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 26, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cw.png" alt="">
+      <span class="match__team-name">Curaçao</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ci.png" alt="">
+      <span class="match__team-name">Ivory Coast</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group E</span>
+    <time class="match__time">Jun 26, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ec.png" alt="">
+      <span class="match__team-name">Ecuador</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/de.png" alt="">
+      <span class="match__team-name">Germany</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 26, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jp.png" alt="">
+      <span class="match__team-name">Japan</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/se.png" alt="">
+      <span class="match__team-name">Sweden</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group F</span>
+    <time class="match__time">Jun 26, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tn.png" alt="">
+      <span class="match__team-name">Tunisia</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nl.png" alt="">
+      <span class="match__team-name">Netherlands</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 26, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/py.png" alt="">
+      <span class="match__team-name">Paraguay</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/au.png" alt="">
+      <span class="match__team-name">Australia</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group D</span>
+    <time class="match__time">Jun 26, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/tr.png" alt="">
+      <span class="match__team-name">Turkey</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/us.png" alt="">
+      <span class="match__team-name">United States</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 27, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sn.png" alt="">
+      <span class="match__team-name">Senegal</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/iq.png" alt="">
+      <span class="match__team-name">Iraq</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group I</span>
+    <time class="match__time">Jun 27, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/no.png" alt="">
+      <span class="match__team-name">Norway</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/fr.png" alt="">
+      <span class="match__team-name">France</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 27, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uy.png" alt="">
+      <span class="match__team-name">Uruguay</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/es.png" alt="">
+      <span class="match__team-name">Spain</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio Akron, Guadalajara (Zapopan)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group H</span>
+    <time class="match__time">Jun 27, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cv.png" alt="">
+      <span class="match__team-name">Cape Verde</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/sa.png" alt="">
+      <span class="match__team-name">Saudi Arabia</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 27, 09:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/eg.png" alt="">
+      <span class="match__team-name">Egypt</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ir.png" alt="">
+      <span class="match__team-name">Iran</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group G</span>
+    <time class="match__time">Jun 27, 09:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/nz.png" alt="">
+      <span class="match__team-name">New Zealand</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/be.png" alt="">
+      <span class="match__team-name">Belgium</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 28, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pa.png" alt="">
+      <span class="match__team-name">Panama</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gb-eng.png" alt="">
+      <span class="match__team-name">England</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group L</span>
+    <time class="match__time">Jun 28, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/hr.png" alt="">
+      <span class="match__team-name">Croatia</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/gh.png" alt="">
+      <span class="match__team-name">Ghana</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 28, 05:30 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/co.png" alt="">
+      <span class="match__team-name">Colombia</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/pt.png" alt="">
+      <span class="match__team-name">Portugal</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group K</span>
+    <time class="match__time">Jun 28, 05:30 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/cd.png" alt="">
+      <span class="match__team-name">Democratic Republic of the Congo</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/uz.png" alt="">
+      <span class="match__team-name">Uzbekistan</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 28, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/dz.png" alt="">
+      <span class="match__team-name">Algeria</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/at.png" alt="">
+      <span class="match__team-name">Austria</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group J</span>
+    <time class="match__time">Jun 28, 08:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/jo.png" alt="">
+      <span class="match__team-name">Jordan</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://flagcdn.com/w80/ar.png" alt="">
+      <span class="match__team-name">Argentina</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article><h2 class="matchday-heading"><span>Matchday 4</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jun 29, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group A</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group B</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jun 29, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group C</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group F</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jun 30, 02:30 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group E</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group A/B/C/D/F</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jun 30, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group F</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group C</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio BBVA, Monterrey (Guadalupe)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jun 30, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group E</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group I</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 01, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group I</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group C/D/F/G/H</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 01, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group A</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group C/E/F/H/I</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio Azteca, Mexico City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 01, 10:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group L</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group E/H/I/J/K</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 02, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group G</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group A/E/H/I/J</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 02, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group D</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group B/E/F/I/J</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Levi's Stadium, San Francisco Bay Area (Santa Clara)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 03, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group H</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group J</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 03, 05:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group K</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group L</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BMO Field, Toronto</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 03, 09:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group B</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group E/F/G/I/J</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BC Place, Vancouver</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 04, 12:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group D</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group G</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 04, 04:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group J</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Runner-up Group H</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R32</span>
+    <time class="match__time">Jul 04, 07:30 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Group K</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">3rd Group D/E/I/J/L</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article><h2 class="matchday-heading"><span>Matchday 5</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 04, 11:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 73</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 75</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">NRG Stadium, Houston</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 05, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 74</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 77</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lincoln Financial Field, Philadelphia</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 06, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 76</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 78</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 06, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 79</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 80</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Estadio Azteca, Mexico City</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 07, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 83</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 84</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 07, 06:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 81</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 82</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Lumen Field, Seattle</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 07, 10:00 PM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 86</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 88</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group R16</span>
+    <time class="match__time">Jul 08, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 85</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 87</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">BC Place, Vancouver</p>
+</article><h2 class="matchday-heading"><span>Matchday 6</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group QF</span>
+    <time class="match__time">Jul 10, 02:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 89</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 90</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Gillette Stadium, Boston (Foxborough)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group QF</span>
+    <time class="match__time">Jul 11, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 93</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 94</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">SoFi Stadium, Los Angeles (Inglewood)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group QF</span>
+    <time class="match__time">Jul 12, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 91</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 92</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group QF</span>
+    <time class="match__time">Jul 12, 07:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 95</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 96</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">GEHA Field at Arrowhead Stadium, Kansas City</p>
+</article><h2 class="matchday-heading"><span>Matchday 7</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group SF</span>
+    <time class="match__time">Jul 15, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 97</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 98</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">AT&T Stadium, Dallas (Arlington, Texas)</p>
+</article>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group SF</span>
+    <time class="match__time">Jul 16, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 99</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 100</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Mercedes-Benz Stadium, Atlanta</p>
+</article><h2 class="matchday-heading"><span>Matchday 8</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group 3RD</span>
+    <time class="match__time">Jul 19, 03:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Loser Match 101</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Loser Match 102</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">Hard Rock Stadium, Miami (Miami Gardens)</p>
+</article><h2 class="matchday-heading"><span>Matchday 9</span></h2>
+<article class="match ">
+  <header class="match__meta">
+    <span class="match__group">Group FINAL</span>
+    <time class="match__time">Jul 20, 01:00 AM</time>
+  </header>
+  <div class="match__body">
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 101</span>
+    </div>
+    <div class="match__score"><span class="match__vs">VS</span></div>
+    <div class="match__team">
+      <img src="https://placehold.co/60x40?text=Flag" alt="">
+      <span class="match__team-name">Winner Match 102</span>
+    </div>
+  </div>
+  
+  <p class="match__venue">MetLife Stadium, New York/New Jersey (East Rutherford)</p>
+</article>
+</main>
+</div>
+</body>
+
+</html>
